@@ -15,6 +15,6 @@ loadEnv();
 
 export const serverConfig: ServerConfig = {
     PORT: Number(process.env.PORT) || 3003,
-    PROBLEM_SERVICE: process.env.PROBLEM_SERVICE || "http://localhost:3000/api/v1",
+    PROBLEM_SERVICE: process.env.PROBLEM_SERVICE || "http://localhost:3001/api/v1",
     SUBMISSION_SERVICE: process.env.SUBMISSION_SERVICE || "http://localhost:3002/api/v1"
 };
