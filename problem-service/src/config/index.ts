@@ -14,5 +14,5 @@ loadEnv();
 
 export const serverConfig: ServerConfig = {
     PORT: Number(process.env.PORT) || 3001,
-    DB_URL: process.env.DB_URL || "mongodb://root:secret@localhost:27017/lcdb?authSource=admin",
+    DB_URL: process.env.DB_URL || "mongodb://root:secret@localhost:27017/lcdb_problems?authSource=admin",
 }
