@@ -18,5 +18,5 @@ export const serverConfig: ServerConfig = {
     DB_URL:
       process.env.DB_URL ||
       "mongodb://root:secret@localhost:27017/lcdb_submissions?authSource=admin",
-    PROBLEM_SERVICE: process.env.PROBLEM_SERVICE || "http://localhost:3000/api/v1"
+    PROBLEM_SERVICE: process.env.PROBLEM_SERVICE || "http://localhost:3001/api/v1"
 };

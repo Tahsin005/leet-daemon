@@ -23,6 +23,8 @@ redis.on("error", (error) => {
     logger.error("Redis connection error", error);
 });
 
-export const createNewRedisConnection = () => {
-    return new Redis(redisConfig);
-}
+export const bullmqRedisConnection = {
+    host: redisConfig.host,
+    port: redisConfig.port,
+    maxRetriesPerRequest: null as null,
+};

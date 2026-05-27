@@ -10,9 +10,9 @@ problemRouter.post(
     validateRequestBody(createProblemSchema), 
     ProblemController.createProblem);
     
-    problemRouter.get(
-        '/search', 
-        ProblemController.searchProblems);
+problemRouter.get(
+    '/search', 
+    ProblemController.searchProblems);
 
 problemRouter.get(
     '/:id',
