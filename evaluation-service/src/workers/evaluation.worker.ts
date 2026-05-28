@@ -1,11 +1,39 @@
 import { Job, Worker } from "bullmq";
 import { SUBMISSION_QUEUE } from "../utils/contants";
 import logger from "../config/logger.config";
-import { EvaluationJob, EvaluationResult } from "../interfaces/evaluation.interface";
+import { EvaluationJob, EvaluationResult, TestCase } from "../interfaces/evaluation.interface";
 import { bullmqRedisConnection } from "../config/redis.config";
 import { updateSubmission } from "../api/submission.api";
 import { runCode } from "../utils/containers/codeRunner.util";
 import { LANGUAGE_CONFIG } from "../config/language.config";
+
+function matchTestCasesWithResults(testCases: TestCase[], results: EvaluationResult[]) {
+    const output: Record<string, string> = {}
+    if(results.length !== testCases.length) {
+        console.log("WA");
+        return;
+    }
+    testCases.map((testCase, index) => {
+        let retval = "";
+        if(results[index].status === "time_limit_exceeded") {
+            retval = "TLE";
+        } else if (results[index].status === "failed") {
+            retval = "Error";
+        } else {
+            // match the output with the test case output
+            if(results[index].output === testCase.output) {
+                retval = "AC";
+            } else {
+                retval = "WA";
+            }
+        }
+
+        console.log("retval", retval);
+        output[testCase._id] = retval;
+    });
+
+    return output;
+}
 
 async function setupEvaluationWorker() {
   const worker = new Worker(SUBMISSION_QUEUE, async (job: Job) => { 
@@ -31,8 +59,12 @@ async function setupEvaluationWorker() {
         const testCasesRunnerResults: EvaluationResult[] = await Promise.all(testCasesRunnerPromise);
         
         console.log("testCasesRunnerResults", testCasesRunnerResults);
+  
+        const output = matchTestCasesWithResults(data.problem.testcases, testCasesRunnerResults);
+      
+        console.log("output", output);
 
-        await updateSubmission(data.submissionId, "completed", {});
+        await updateSubmission(data.submissionId, "completed", output || {});
     } catch (error) {
       logger.error(`Evaluation job failed: ${job}`, error);
       return;
