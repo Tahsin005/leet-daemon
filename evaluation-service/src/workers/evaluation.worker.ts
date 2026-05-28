@@ -3,6 +3,7 @@ import { SUBMISSION_QUEUE } from "../utils/contants";
 import logger from "../config/logger.config";
 import { EvaluationJob } from "../interfaces/evaluation.interface";
 import { bullmqRedisConnection } from "../config/redis.config";
+import { updateSubmission } from "../api/submission.api";
 
 async function setupEvaluationWorker() {
   const worker = new Worker(SUBMISSION_QUEUE, async (job: Job) => { 
@@ -15,7 +16,7 @@ async function setupEvaluationWorker() {
 
     try {
         // run the code in a container and evaluate it against the test cases
-        
+        await updateSubmission(data.submissionId, "completed", {});
     } catch (error) {
       logger.error(`Evaluation job failed: ${job}`, error);
       return;
