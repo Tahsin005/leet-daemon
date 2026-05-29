@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import { ZodObject } from "zod";
 type AnyZodObject = ZodObject<any>;
 import logger from "../config/logger.config";
+import { BadRequestError } from "../utils/errors/app.error";
 
 export const validateRequestBody = (schema: AnyZodObject) => {
     return async (req: Request, res: Response, next: NextFunction) => {
@@ -13,14 +14,8 @@ export const validateRequestBody = (schema: AnyZodObject) => {
             next();
 
         } catch (error) {
-            // If the validation fails, 
             logger.error("Request body is invalid");
-            res.status(400).json({
-                message: "Invalid request body",
-                success: false,
-                error: error
-            });
-            
+            next(new BadRequestError("Invalid request body"));
         }
     }
 }
@@ -34,14 +29,7 @@ export const validateQueryParams = (schema: AnyZodObject) => {
             next();
 
         } catch (error) {
-            // If the validation fails, 
-
-            res.status(400).json({
-                message: "Invalid query params",
-                success: false,
-                error: error
-            });
-            
+            next(new BadRequestError("Invalid query params"));
         }
     }
 }
@@ -53,11 +41,7 @@ export const validateRequestParams = (schema: AnyZodObject) => {
             next();
         }
         catch (error) {
-            res.status(400).json({
-                message: "Invalid request params",
-                success: false,
-                error: error
-            });
+            next(new BadRequestError("Invalid request params"));
         }
     }
 }
