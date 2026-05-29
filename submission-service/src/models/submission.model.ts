@@ -13,10 +13,7 @@ export enum SubmissionLanguage {
     PYTHON = "python",
 }
 
-export interface ISubmissionData {
-    testCaseId: string;
-    status: string;
-}
+export type ISubmissionData = Record<string, string>;
 export interface ISubmission extends Document {
     id: string;
     problemId: string;

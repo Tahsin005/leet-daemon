@@ -7,24 +7,32 @@ import { updateSubmission } from "../api/submission.api";
 import { runCode } from "../utils/containers/codeRunner.util";
 import { LANGUAGE_CONFIG } from "../config/language.config";
 
+type SubmissionStatus = "completed" | "pending" | "running" | "accepted" | "wrong_answer";
+
 function matchTestCasesWithResults(testCases: TestCase[], results: EvaluationResult[]) {
     const output: Record<string, string> = {}
     if(results.length !== testCases.length) {
         console.log("WA");
-        return;
+        return { output, allAccepted: false };
     }
-    testCases.map((testCase, index) => {
+
+    let allAccepted = true;
+
+    testCases.forEach((testCase, index) => {
         let retval = "";
         if(results[index].status === "time_limit_exceeded") {
             retval = "TLE";
+            allAccepted = false;
         } else if (results[index].status === "failed") {
             retval = "Error";
+            allAccepted = false;
         } else {
             // match the output with the test case output
             if(results[index].output === testCase.output) {
                 retval = "AC";
             } else {
                 retval = "WA";
+                allAccepted = false;
             }
         }
 
@@ -32,7 +40,7 @@ function matchTestCasesWithResults(testCases: TestCase[], results: EvaluationRes
         output[testCase._id] = retval;
     });
 
-    return output;
+    return { output, allAccepted };
 }
 
 async function setupEvaluationWorker() {
@@ -45,6 +53,9 @@ async function setupEvaluationWorker() {
     console.log("data.problem.testcases", data.problem.testcases);
 
     try {
+        // mark as running as soon as the worker picks it up
+        await updateSubmission(data.submissionId, "running" satisfies SubmissionStatus, {});
+
         // run the code in a container and evaluate it against the test cases
         const testCasesRunnerPromise = data.problem.testcases.map(testcase => {
             return runCode({
@@ -60,11 +71,13 @@ async function setupEvaluationWorker() {
         
         console.log("testCasesRunnerResults", testCasesRunnerResults);
   
-        const output = matchTestCasesWithResults(data.problem.testcases, testCasesRunnerResults);
-      
+        const matched = matchTestCasesWithResults(data.problem.testcases, testCasesRunnerResults);
+        const output = matched.output;
+        const finalStatus: SubmissionStatus = matched.allAccepted ? "accepted" : "wrong_answer";
+
         console.log("output", output);
 
-        await updateSubmission(data.submissionId, "completed", output || {});
+        await updateSubmission(data.submissionId, finalStatus, output || {});
     } catch (error) {
       logger.error(`Evaluation job failed: ${job}`, error);
       return;
