@@ -3,7 +3,7 @@ import { SUBMISSION_QUEUE } from "../utils/contants";
 import logger from "../config/logger.config";
 import { EvaluationJob, EvaluationResult, TestCase } from "../interfaces/evaluation.interface";
 import { bullmqRedisConnection } from "../config/redis.config";
-import { updateSubmission } from "../api/submission.api";
+import { updateSubmission } from "../grpc/submission.client";
 import { runCode } from "../utils/containers/codeRunner.util";
 import { LANGUAGE_CONFIG } from "../config/language.config";
 
@@ -37,7 +37,11 @@ function matchTestCasesWithResults(testCases: TestCase[], results: EvaluationRes
         }
 
         console.log("retval", retval);
-        output[testCase._id] = retval;
+        const key = (testCase as any)._id ?? (testCase as any).id ?? `tc_${index}`;
+        if (!(testCase as any)._id && !(testCase as any).id) {
+            logger.warn("Testcase is missing id/_id; using fallback key", { index });
+        }
+        output[key] = retval;
     });
 
     return { output, allAccepted };
