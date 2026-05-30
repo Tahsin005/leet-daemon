@@ -1,8 +1,7 @@
 import { SubmissionLanguage } from "../models/submission.model";
 import { submissionQueue } from "../queues/submission.queue";
 import logger from "../config/logger.config";
-import { IProblemDetails } from "../api/problem.api";
-
+import { IProblemDetails } from "../grpc/problem.client";
 
 export interface ISubmissionJob {
     submissionId: string;

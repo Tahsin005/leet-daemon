@@ -1,0 +1,30 @@
+syntax = "proto3";
+
+package problem;
+
+service ProblemService {
+  rpc GetProblemById (GetProblemByIdRequest) returns (GetProblemByIdResponse);
+}
+
+message GetProblemByIdRequest {
+  string problem_id = 1;
+}
+
+message GetProblemByIdResponse {
+  Problem problem = 1;
+}
+
+message Problem {
+  string id          = 1;
+  string title       = 2;
+  string description = 3;
+  string difficulty  = 4;
+  string editorial   = 5;
+  repeated Testcase testcases = 6;
+}
+
+message Testcase {
+  string id     = 1;
+  string input  = 2;
+  string output = 3;
+}

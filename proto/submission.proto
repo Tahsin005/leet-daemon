@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+package submission;
+
+service SubmissionService {
+  rpc UpdateSubmission (UpdateSubmissionRequest) returns (UpdateSubmissionResponse);
+}
+
+message UpdateSubmissionRequest {
+  string submission_id           = 1;
+  string status                  = 2;
+  map<string, string> output     = 3;
+}
+
+message UpdateSubmissionResponse {
+  bool   success = 1;
+  string message = 2;
+}

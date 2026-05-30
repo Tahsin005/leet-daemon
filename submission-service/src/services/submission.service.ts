@@ -1,4 +1,4 @@
-import { getProblemById } from "../api/problem.api";
+import { getProblemById } from "../grpc/problem.client";
 import logger from "../config/logger.config";
 import { ISubmission, ISubmissionData, SubmissionStatus } from "../models/submission.model";
 import { addSubmissionJob } from "../producers/submission.producer";
@@ -46,9 +46,15 @@ export class SubmissionService implements ISubmissionService {
         const submission = await this.submissionRepository.create(submissionData);
 
         // submission to redis queue
+        const problemPayload = {
+            ...problem,
+            createdAt: (problem as { createdAt?: Date }).createdAt ?? new Date(),
+            updatedAt: (problem as { updatedAt?: Date }).updatedAt ?? new Date()
+        };
+
         const jobId = await addSubmissionJob({
             submissionId: submission.id,
-            problem,
+            problem: problemPayload,
             code: submissionData.code,
             language: submissionData.language
         });

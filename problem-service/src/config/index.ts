@@ -3,6 +3,7 @@ import dotenv from 'dotenv';
 type ServerConfig = {
   PORT: number
   DB_URL: string
+  GRPC_PORT: number
 }
 
 function loadEnv() {
@@ -15,4 +16,5 @@ loadEnv();
 export const serverConfig: ServerConfig = {
     PORT: Number(process.env.PORT) || 3001,
     DB_URL: process.env.DB_URL || "mongodb://root:secret@localhost:27017/lcdb_problems?authSource=admin",
+    GRPC_PORT: Number(process.env.GRPC_PORT) || 50051,
 }
